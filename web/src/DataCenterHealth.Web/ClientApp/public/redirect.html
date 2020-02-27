@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>DC Health Logon</title>
+</head>
+<style type="text/css">
+    body {
+        color: black;
+        background: white none;
+    }
+
+    .hidden {
+        display: none;
+    }
+</style>
+
+<body>
+    <div id="3rd_party_cookie_error" class="error hidden">
+        <p aria-label="Third party cookies disabled error.">You seem
+            to
+            have enabled "Block third-party
+            cookies" in your
+            browser. Product Catalog needs it to be disabled to work properly. Please do one of these to unblock
+            yourself:
+            <ul>
+                <li>Please unset “Block third-party cookies” in the Chrome settings: chrome://settings/content/cookies</li>
+                <li>Use Edge browser</li>
+                <li>Disable uBlock extension in Chrome if you use it</li>
+            </ul>
+        </p>
+    </div>
+
+    <script>
+        function _deserializeHash(query) {
+            var match,
+                pl = /\+/g,  // Regex for replacing addition symbol with a space
+                search = /([^&=]+)=([^&]*)/g,
+                decode = function (s) {
+                    return decodeURIComponent(s.replace(pl, ' '));
+                },
+                obj = {};
+            match = search.exec(query);
+
+            while (match) {
+                obj[decode(match[1])] = decode(match[2]);
+                match = search.exec(query);
+            }
+
+            return obj;
+        };
+
+        function getCustomStateFromState(state) {
+            if (!state) {
+                return "";
+            }
+            var stateSplits = state.split("|");
+            var customStateSplit = "";
+            var reply_to_regex = /reply_to/gi;
+            for (i = 0; i < stateSplits.length; ++i) {
+                if (stateSplits[i].match(reply_to_regex)) {
+                    customStateSplit = stateSplits[i];
+                    break;
+                }
+            }
+            if (!customStateSplit) {
+                return "";
+            }
+            var customStateSplitParams = _deserializeHash(customStateSplit);
+            return customStateSplitParams.customState;
+        }
+
+        function get_reply_to_url() {
+            var hashParameters = _deserializeHash(location.hash);
+            var customState = getCustomStateFromState(hashParameters.state);
+            if (!customState) {
+                return "";
+            }
+            var customStateParams = _deserializeHash(customState);
+            return customStateParams.reply_to;
+        }
+
+        function redirectToAuthOriginPage() {
+            var reply_to_url = get_reply_to_url();
+            if (reply_to_url) {
+                var url = new URL(reply_to_url);
+                url.hash = location.hash;
+                window.location = url;
+            } else if (document.referrer !== window.location.href) {
+                window.location = document.referrer + location.hash;
+            }
+        }
+
+        redirectToAuthOriginPage();
+    </script>
+</body>
+
+</html>

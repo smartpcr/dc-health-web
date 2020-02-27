@@ -1,0 +1,12 @@
+{
+  "common": {
+      "title": "DC Health",
+      "pivot": {
+          "all": "All",
+          "mine": "Mine"
+      },
+      "spinner": {
+          "label": "Loading"
+      }
+  }
+}
